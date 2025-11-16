@@ -60,11 +60,19 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if the user is a client.
+     * Check if the user is a billing user.
      */
-    public function isClient(): bool
+    public function isBilling(): bool
     {
-        return $this->role === 'client';
+        return $this->role === 'billing';
+    }
+
+    /**
+     * Check if the user is an admitting user.
+     */
+    public function isAdmitting(): bool
+    {
+        return $this->role === 'admitting';
     }
 
     /**

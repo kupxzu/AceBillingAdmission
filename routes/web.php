@@ -13,15 +13,19 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
-        // Redirect clients to their specific dashboard
         $user = Auth::user();
-        if ($user && $user->role === 'client') {
-            return redirect()->route('client.dashboard');
+        
+        // Redirect based on user role
+        if ($user && $user->role === 'billing') {
+            return redirect()->route('billing.dashboard');
         }
         
-        // Redirect admins to admin dashboard
         if ($user && $user->role === 'admin') {
             return redirect()->route('admin.dashboard');
+        }
+        
+        if ($user && $user->role === 'admitting') {
+            return redirect()->route('admitting.dashboard');
         }
         
         return Inertia::render('dashboard');
@@ -35,9 +39,14 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::get('clients/{client}', [\App\Http\Controllers\Admin\ClientController::class, 'show'])->name('clients.show');
 });
 
-// Client Dashboard Routes
-Route::middleware(['auth', 'verified', 'role:client'])->prefix('client')->name('client.')->group(function () {
-    Route::get('dashboard', [\App\Http\Controllers\Client\DashboardController::class, 'index'])->name('dashboard');
+// Billing Dashboard Routes
+Route::middleware(['auth', 'verified', 'role:billing'])->prefix('billing')->name('billing.')->group(function () {
+    Route::get('dashboard', [\App\Http\Controllers\Billing\DashboardController::class, 'index'])->name('dashboard');
+});
+
+// Admitting Dashboard Routes
+Route::middleware(['auth', 'verified', 'role:admitting'])->prefix('admitting')->name('admitting.')->group(function () {
+    Route::get('dashboard', [\App\Http\Controllers\Admitting\DashboardController::class, 'index'])->name('dashboard');
 });
 
 require __DIR__.'/settings.php';

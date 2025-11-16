@@ -13,25 +13,25 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, FileText, CreditCard, Users, Settings } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, FileText, CreditCard, Users, Settings, Activity, ClipboardList } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const getNavItemsForRole = (role?: string): NavItem[] => {
-    if (role === 'client') {
+    if (role === 'billing') {
         return [
             {
-                title: 'Client Dashboard',
-                href: '/client/dashboard',
+                title: 'Billing Dashboard',
+                href: '/billing/dashboard',
                 icon: LayoutGrid,
             },
             {
                 title: 'My Invoices',
-                href: '/client/invoices',
+                href: '/billing/invoices',
                 icon: FileText,
             },
             {
                 title: 'Payments',
-                href: '/client/payments',
+                href: '/billing/payments',
                 icon: CreditCard,
             },
         ];
@@ -62,6 +62,31 @@ const getNavItemsForRole = (role?: string): NavItem[] => {
         ];
     }
 
+    if (role === 'admitting') {
+        return [
+            {
+                title: 'Admitting Dashboard',
+                href: '/admitting/dashboard',
+                icon: LayoutGrid,
+            },
+            {
+                title: 'Patients',
+                href: '/admitting/patients',
+                icon: Users,
+            },
+            {
+                title: 'Admissions',
+                href: '/admitting/admissions',
+                icon: ClipboardList,
+            },
+            {
+                title: 'Activity Log',
+                href: '/admitting/activity',
+                icon: Activity,
+            },
+        ];
+    }
+
     return [
         {
             title: 'Dashboard',
@@ -88,10 +113,12 @@ export function AppSidebar() {
     const { auth } = usePage<{ auth: { user: { role?: string } } }>().props;
     const mainNavItems = getNavItemsForRole(auth.user?.role);
     
-    const homeUrl = auth.user?.role === 'client' 
-        ? '/client/dashboard' 
+    const homeUrl = auth.user?.role === 'billing' 
+        ? '/billing/dashboard' 
         : auth.user?.role === 'admin'
         ? '/admin/dashboard'
+        : auth.user?.role === 'admitting'
+        ? '/admitting/dashboard'
         : dashboard();
 
     return (

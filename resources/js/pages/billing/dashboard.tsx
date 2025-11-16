@@ -6,8 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Client Dashboard',
-        href: '/client/dashboard',
+        title: 'Billing Dashboard',
+        href: '/billing/dashboard',
     },
 ];
 
@@ -18,7 +18,7 @@ interface DashboardStats {
     total_amount_due: number;
 }
 
-export default function ClientDashboard() {
+export default function BillingDashboard() {
     const { stats } = usePage<{ stats: DashboardStats }>().props;
 
     const statsCards = [
@@ -54,7 +54,7 @@ export default function ClientDashboard() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Client Dashboard" />
+            <Head title="Billing Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-6 p-4 md:p-6">
                 {/* Welcome Section */}
                 <div className="flex flex-col gap-2">

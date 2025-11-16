@@ -22,37 +22,46 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface DashboardStats {
-    total_clients: number;
+    total_billing: number;
+    total_admitting: number;
     total_admins: number;
-    verified_clients: number;
+    verified_users: number;
     recent_signups: number;
 }
 
-interface Client {
+interface UserData {
     id: number;
     name: string;
     email: string;
+    role: 'billing' | 'admitting';
     created_at: string;
     email_verified_at: string | null;
 }
 
 export default function AdminDashboard() {
-    const { stats, recentClients } = usePage<{
+    const { stats, recentUsers } = usePage<{
         stats: DashboardStats;
-        recentClients: Client[];
+        recentUsers: UserData[];
     }>().props;
 
     const statsCards = [
         {
-            title: 'Total Clients',
-            value: stats.total_clients,
-            description: 'All registered clients',
+            title: 'Billing Users',
+            value: stats.total_billing,
+            description: 'All billing staff',
             icon: Users,
             color: 'text-blue-600 dark:text-blue-400',
         },
         {
-            title: 'Verified Clients',
-            value: stats.verified_clients,
+            title: 'Admitting Users',
+            value: stats.total_admitting,
+            description: 'All admitting staff',
+            icon: Users,
+            color: 'text-cyan-600 dark:text-cyan-400',
+        },
+        {
+            title: 'Verified Users',
+            value: stats.verified_users,
             description: 'Email verified',
             icon: UserCheck,
             color: 'text-green-600 dark:text-green-400',
@@ -63,13 +72,6 @@ export default function AdminDashboard() {
             description: 'Last 30 days',
             icon: UserPlus,
             color: 'text-orange-600 dark:text-orange-400',
-        },
-        {
-            title: 'Total Admins',
-            value: stats.total_admins,
-            description: 'Administrator accounts',
-            icon: Shield,
-            color: 'text-purple-600 dark:text-purple-400',
         },
     ];
 
@@ -116,40 +118,46 @@ export default function AdminDashboard() {
                     })}
                 </div>
 
-                {/* Recent Clients Table */}
+                {/* Recent Users Table */}
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
                         <div>
-                            <CardTitle>Recent Clients</CardTitle>
+                            <CardTitle>Recent Users</CardTitle>
                             <CardDescription>
-                                Latest client registrations
+                                Latest user registrations
                             </CardDescription>
                         </div>
                         <Button asChild>
-                            <Link href="/admin/clients">View All Clients</Link>
+                            <Link href="/admin/clients">View All Users</Link>
                         </Button>
                     </CardHeader>
                     <CardContent>
-                        {recentClients.length > 0 ? (
+                        {recentUsers.length > 0 ? (
                             <Table>
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Name</TableHead>
                                         <TableHead>Email</TableHead>
+                                        <TableHead>Role</TableHead>
                                         <TableHead>Status</TableHead>
                                         <TableHead>Joined</TableHead>
                                         <TableHead className="text-right">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {recentClients.map((client) => (
-                                        <TableRow key={client.id}>
+                                    {recentUsers.map((user) => (
+                                        <TableRow key={user.id}>
                                             <TableCell className="font-medium">
-                                                {client.name}
+                                                {user.name}
                                             </TableCell>
-                                            <TableCell>{client.email}</TableCell>
+                                            <TableCell>{user.email}</TableCell>
                                             <TableCell>
-                                                {client.email_verified_at ? (
+                                                <Badge variant="outline" className="capitalize">
+                                                    {user.role}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                {user.email_verified_at ? (
                                                     <Badge variant="default" className="bg-green-500">
                                                         Verified
                                                     </Badge>
@@ -160,7 +168,7 @@ export default function AdminDashboard() {
                                                 )}
                                             </TableCell>
                                             <TableCell>
-                                                {formatDate(client.created_at)}
+                                                {formatDate(user.created_at)}
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <Button
@@ -168,7 +176,7 @@ export default function AdminDashboard() {
                                                     size="sm"
                                                     asChild
                                                 >
-                                                    <Link href={`/admin/clients/${client.id}`}>
+                                                    <Link href={`/admin/clients/${user.id}`}>
                                                         View
                                                     </Link>
                                                 </Button>
@@ -179,7 +187,7 @@ export default function AdminDashboard() {
                             </Table>
                         ) : (
                             <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
-                                No clients yet
+                                No users yet
                             </div>
                         )}
                     </CardContent>

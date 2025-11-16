@@ -24,29 +24,41 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // Create a client user
+        // Create a billing user
         User::firstOrCreate(
-            ['email' => 'client@example.com'],
+            ['email' => 'billing@example.com'],
             [
-                'name' => 'Client User',
+                'name' => 'Billing User',
                 'password' => 'password',
-                'role' => 'client',
+                'role' => 'billing',
                 'email_verified_at' => now(),
             ]
         );
 
-        // Keep the existing test user as a client
+        // Create an admitting user
+        User::firstOrCreate(
+            ['email' => 'admitting@example.com'],
+            [
+                'name' => 'Admitting User',
+                'password' => 'password',
+                'role' => 'admitting',
+                'email_verified_at' => now(),
+            ]
+        );
+
+        // Keep the existing test user as billing
         User::firstOrCreate(
             ['email' => 'test@example.com'],
             [
                 'name' => 'Test User',
                 'password' => 'password',
-                'role' => 'client',
+                'role' => 'billing',
                 'email_verified_at' => now(),
             ]
         );
 
-        // Create additional test clients
-        User::factory()->client()->count(10)->create();
+        // Create additional test users for each role
+        User::factory()->billing()->count(5)->create();
+        User::factory()->admitting()->count(5)->create();
     }
 }

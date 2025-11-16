@@ -27,7 +27,7 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= 'password',
-            'role' => 'client',
+            'role' => 'billing',
             'remember_token' => Str::random(10),
             'two_factor_secret' => Str::random(10),
             'two_factor_recovery_codes' => Str::random(10),
@@ -56,12 +56,22 @@ class UserFactory extends Factory
     }
 
     /**
-     * Indicate that the user is a client.
+     * Indicate that the user is a billing user.
      */
-    public function client(): static
+    public function billing(): static
     {
         return $this->state(fn (array $attributes) => [
-            'role' => 'client',
+            'role' => 'billing',
+        ]);
+    }
+
+    /**
+     * Indicate that the user is an admitting user.
+     */
+    public function admitting(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'admitting',
         ]);
     }
 

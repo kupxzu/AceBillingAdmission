@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Client;
+namespace App\Http\Controllers\Billing;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -10,11 +10,11 @@ use Inertia\Response;
 class DashboardController extends Controller
 {
     /**
-     * Display the client dashboard.
+     * Display the billing dashboard.
      */
     public function index(Request $request): Response
     {
-        return Inertia::render('client/dashboard', [
+        return Inertia::render('billing/dashboard', [
             'stats' => [
                 'total_invoices' => 0,
                 'pending_invoices' => 0,
