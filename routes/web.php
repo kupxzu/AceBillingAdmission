@@ -41,6 +41,9 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     
     // User Management
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+    
+    // Activity Logs
+    Route::get('activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-logs.index');
 });
 
 // Billing Dashboard Routes

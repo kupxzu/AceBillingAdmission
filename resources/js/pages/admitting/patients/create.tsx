@@ -6,9 +6,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import InputError from '@/components/input-error';
 import { Spinner } from '@/components/ui/spinner';
 import { toast } from 'react-toastify';
+import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -26,6 +34,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function CreatePatient() {
+    const [showCustomExtension, setShowCustomExtension] = useState(false);
+    
     const { data, setData, post, processing, errors } = useForm({
         first_name: '',
         last_name: '',
@@ -114,12 +124,52 @@ export default function CreatePatient() {
 
                                 <div className="space-y-2">
                                     <Label htmlFor="extension_name">Extension Name</Label>
-                                    <Input
-                                        id="extension_name"
-                                        value={data.extension_name}
-                                        onChange={(e) => setData('extension_name', e.target.value)}
-                                        placeholder="Jr., Sr., III"
-                                    />
+                                    {!showCustomExtension ? (
+                                        <Select
+                                            value={data.extension_name}
+                                            onValueChange={(value) => {
+                                                if (value === 'custom') {
+                                                    setShowCustomExtension(true);
+                                                    setData('extension_name', '');
+                                                } else {
+                                                    setData('extension_name', value);
+                                                }
+                                            }}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select extension" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="none">None</SelectItem>
+                                                <SelectItem value="Jr.">Jr.</SelectItem>
+                                                <SelectItem value="Sr.">Sr.</SelectItem>
+                                                <SelectItem value="II">II</SelectItem>
+                                                <SelectItem value="III">III</SelectItem>
+                                                <SelectItem value="IV">IV</SelectItem>
+                                                <SelectItem value="custom">Custom (type your own)</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    ) : (
+                                        <div className="flex gap-2">
+                                            <Input
+                                                id="extension_name"
+                                                value={data.extension_name}
+                                                onChange={(e) => setData('extension_name', e.target.value)}
+                                                placeholder="Enter custom extension"
+                                                autoFocus
+                                            />
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() => {
+                                                    setShowCustomExtension(false);
+                                                    setData('extension_name', '');
+                                                }}
+                                            >
+                                                Cancel
+                                            </Button>
+                                        </div>
+                                    )}
                                     <InputError message={errors.extension_name} />
                                 </div>
                             </div>

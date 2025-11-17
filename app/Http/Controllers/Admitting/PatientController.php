@@ -8,6 +8,7 @@ use App\Models\DocAttending;
 use App\Models\DocAdmitting;
 use App\Models\PtAttendingDoctor;
 use App\Models\PtAdmittingDoctor;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -76,7 +77,15 @@ class PatientController extends Controller
             'address' => 'nullable|string',
         ]);
 
-        Patient::create($validated);
+        $patient = Patient::create($validated);
+
+        ActivityLog::log(
+            'created',
+            'Patient',
+            $patient->id,
+            "Created patient: {$patient->first_name} {$patient->last_name}",
+            ['patient' => $validated]
+        );
 
         return redirect()->route('admitting.patients.index')
             ->with('success', 'Patient created successfully.');
@@ -116,7 +125,16 @@ class PatientController extends Controller
             'address' => 'nullable|string',
         ]);
 
+        $oldData = $patient->toArray();
         $patient->update($validated);
+
+        ActivityLog::log(
+            'updated',
+            'Patient',
+            $patient->id,
+            "Updated patient: {$patient->first_name} {$patient->last_name}",
+            ['old' => $oldData, 'new' => $validated]
+        );
 
         return redirect()->route('admitting.patients.index')
             ->with('success', 'Patient updated successfully.');
@@ -127,7 +145,17 @@ class PatientController extends Controller
      */
     public function destroy(Patient $patient)
     {
+        $patientName = "{$patient->first_name} {$patient->last_name}";
+        $patientId = $patient->id;
+        
         $patient->delete();
+
+        ActivityLog::log(
+            'deleted',
+            'Patient',
+            $patientId,
+            "Deleted patient: {$patientName}"
+        );
 
         return redirect()->route('admitting.patients.index')
             ->with('success', 'Patient deleted successfully.');

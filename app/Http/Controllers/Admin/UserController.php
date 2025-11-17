@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -63,7 +64,15 @@ class UserController extends Controller
         $validated['password'] = Hash::make($validated['password']);
         $validated['email_verified_at'] = now(); // Auto-verify admin-created users
 
-        User::create($validated);
+        $user = User::create($validated);
+
+        ActivityLog::log(
+            'created',
+            'User',
+            $user->id,
+            "Created new user: {$user->name} ({$user->role})",
+            ['user' => ['name' => $user->name, 'email' => $user->email, 'role' => $user->role]]
+        );
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User created successfully.');
@@ -107,7 +116,16 @@ class UserController extends Controller
             $validated['password'] = Hash::make($validated['password']);
         }
 
+        $oldData = $user->only(['name', 'email', 'role']);
         $user->update($validated);
+
+        ActivityLog::log(
+            'updated',
+            'User',
+            $user->id,
+            "Updated user: {$user->name}",
+            ['old' => $oldData, 'new' => $user->only(['name', 'email', 'role'])]
+        );
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User updated successfully.');
@@ -124,7 +142,18 @@ class UserController extends Controller
                 ->with('error', 'You cannot delete your own account.');
         }
 
+        $userName = $user->name;
+        $userId = $user->id;
+        $userRole = $user->role;
+        
         $user->delete();
+
+        ActivityLog::log(
+            'deleted',
+            'User',
+            $userId,
+            "Deleted user: {$userName} ({$userRole})"
+        );
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User deleted successfully.');

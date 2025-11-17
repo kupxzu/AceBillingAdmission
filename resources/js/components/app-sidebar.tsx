@@ -55,6 +55,11 @@ const getNavItemsForRole = (role?: string): NavItem[] => {
                 icon: Users,
             },
             {
+                title: 'Activity Logs',
+                href: '/admin/activity-logs',
+                icon: Activity,
+            },
+            {
                 title: 'All Invoices',
                 href: '/admin/invoices',
                 icon: FileText,
