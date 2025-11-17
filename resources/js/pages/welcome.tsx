@@ -25,7 +25,7 @@ export default function Welcome({
                     <nav className="container mx-auto flex items-center justify-between px-6 py-4">
                         <div className="flex items-center gap-2">
                             <FileText className="size-6 text-primary" />
-                            <span className="text-xl font-bold">AceBilling</span>
+                            <span className="text-xl font-bold">Ace Billing</span>
                         </div>
                         <div className="flex items-center gap-3">
                             {auth.user ? (
@@ -44,14 +44,14 @@ export default function Welcome({
                                     >
                                         Log in
                                     </Link>
-                                    {canRegister && (
+                                    {/* {canRegister && (
                                         <Link
                                             href={register()}
                                             className="inline-block rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                                         >
                                             Register
                                         </Link>
-                                    )}
+                                    )} */}
                                 </>
                             )}
                         </div>
@@ -62,12 +62,9 @@ export default function Welcome({
                 <main className="container mx-auto flex flex-1 flex-col items-center justify-center px-6 py-16 text-center">
                     <div className="mb-12 max-w-3xl">
                         <h1 className="mb-4 text-5xl font-bold tracking-tight lg:text-6xl">
-                            Billing Made Simple
+                            ACE Billing e-SOA
                         </h1>
-                        <p className="mb-8 text-xl text-muted-foreground">
-                            Professional invoice management and client billing system.
-                            Track payments, manage clients, and grow your business.
-                        </p>
+
                         <div className="flex flex-wrap items-center justify-center gap-4">
                             {auth.user ? (
                                 <Link
@@ -79,7 +76,7 @@ export default function Welcome({
                                 </Link>
                             ) : (
                                 <>
-                                    {canRegister && (
+                                    {/* {canRegister && (
                                         <Link
                                             href={register()}
                                             className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 text-base font-medium text-primary-foreground hover:bg-primary/90"
@@ -87,7 +84,7 @@ export default function Welcome({
                                             Get Started
                                             <ArrowRight className="size-5" />
                                         </Link>
-                                    )}
+                                    )} */}
                                     <Link
                                         href={login()}
                                         className="inline-block rounded-md border px-6 py-3 text-base font-medium hover:bg-accent"

@@ -1,7 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
-import { CreditCard, DollarSign, FileText, Clock } from 'lucide-react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { CreditCard, DollarSign, FileText, Clock, Receipt } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -63,6 +63,28 @@ export default function BillingDashboard() {
                         Here's an overview of your billing and invoices.
                     </p>
                 </div>
+
+                {/* Quick Access - Patient SOA */}
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <CardTitle className="flex items-center gap-2">
+                                    <Receipt className="size-5" />
+                                    Patient Statement of Accounts
+                                </CardTitle>
+                                <CardDescription>
+                                    Manage patient billing statements and attachments
+                                </CardDescription>
+                            </div>
+                            <Link href="/billing/patient-soa">
+                                <button className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+                                    View All SOAs
+                                </button>
+                            </Link>
+                        </div>
+                    </CardHeader>
+                </Card>
 
                 {/* Stats Grid */}
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

@@ -13,7 +13,7 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, FileText, CreditCard, Users, Settings, Activity, ClipboardList } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, FileText, CreditCard, Users, Settings, Activity, ClipboardList, Receipt } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const getNavItemsForRole = (role?: string): NavItem[] => {
@@ -23,6 +23,11 @@ const getNavItemsForRole = (role?: string): NavItem[] => {
                 title: 'Billing Dashboard',
                 href: '/billing/dashboard',
                 icon: LayoutGrid,
+            },
+            {
+                title: 'Patient SOA',
+                href: '/billing/patient-soa',
+                icon: Receipt,
             },
             {
                 title: 'My Invoices',

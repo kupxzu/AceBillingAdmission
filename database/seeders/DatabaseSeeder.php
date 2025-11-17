@@ -60,5 +60,8 @@ class DatabaseSeeder extends Seeder
         // Create additional test users for each role
         User::factory()->billing()->count(5)->create();
         User::factory()->admitting()->count(5)->create();
+
+        // Seed sample data for patients, doctors, and rooms
+        $this->call(SampleDataSeeder::class);
     }
 }
