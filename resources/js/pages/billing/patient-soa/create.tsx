@@ -15,7 +15,7 @@ import {
 import InputError from '@/components/input-error';
 import { Spinner } from '@/components/ui/spinner';
 import { FileText, QrCode, Upload, Search, Eye, X } from 'lucide-react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PDFViewer } from '@/components/pdf-viewer';
 import { toast } from 'react-toastify';
@@ -86,13 +86,24 @@ export default function CreatePatientSOA() {
             const file = e.target.files[0];
             setData('soa_attach', file);
             
-            // Create preview URL
-            const url = URL.createObjectURL(file);
-            setPreviewUrl(url);
-            
             // Determine file type
             const isPDF = file.type === 'application/pdf';
             setFileType(isPDF ? 'pdf' : 'image');
+            
+            // For PDFs, use FileReader to create a data URL for react-pdf compatibility
+            if (isPDF) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    if (event.target?.result) {
+                        setPreviewUrl(event.target.result as string);
+                    }
+                };
+                reader.readAsDataURL(file);
+            } else {
+                // For images, use createObjectURL
+                const url = URL.createObjectURL(file);
+                setPreviewUrl(url);
+            }
         }
     };
 
@@ -110,6 +121,15 @@ export default function CreatePatientSOA() {
         setData('soa_link', uniqueLink);
         toast.success('QR Code link generated successfully!');
     };
+
+    // Cleanup blob URLs on unmount
+    useEffect(() => {
+        return () => {
+            if (previewUrl && fileType === 'image' && previewUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(previewUrl);
+            }
+        };
+    }, [previewUrl, fileType]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
