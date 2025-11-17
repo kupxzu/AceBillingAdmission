@@ -91,7 +91,7 @@ export default function AdminDashboard() {
                 <div className="flex flex-col gap-2">
                     <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
                     <p className="text-muted-foreground">
-                        Manage clients and monitor system activity.
+                        Manage users and monitor system activity.
                     </p>
                 </div>
 
@@ -128,7 +128,7 @@ export default function AdminDashboard() {
                             </CardDescription>
                         </div>
                         <Button asChild>
-                            <Link href="/admin/clients">View All Users</Link>
+                            <Link href="/admin/users">View All Users</Link>
                         </Button>
                     </CardHeader>
                     <CardContent>
@@ -176,7 +176,7 @@ export default function AdminDashboard() {
                                                     size="sm"
                                                     asChild
                                                 >
-                                                    <Link href={`/admin/clients/${user.id}`}>
+                                                    <Link href={`/admin/users/${user.id}`}>
                                                         View
                                                     </Link>
                                                 </Button>
@@ -204,13 +204,10 @@ export default function AdminDashboard() {
                     <CardContent>
                         <div className="flex flex-wrap gap-2">
                             <Button asChild>
-                                <Link href="/admin/clients">Manage Clients</Link>
+                                <Link href="/admin/users">Manage Users</Link>
                             </Button>
                             <Button variant="outline" asChild>
-                                <Link href="/admin/invoices">View All Invoices</Link>
-                            </Button>
-                            <Button variant="outline" asChild>
-                                <Link href="/admin/settings">System Settings</Link>
+                                <Link href="/settings/profile">System Settings</Link>
                             </Button>
                         </div>
                     </CardContent>

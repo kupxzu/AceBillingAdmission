@@ -50,8 +50,8 @@ const getNavItemsForRole = (role?: string): NavItem[] => {
                 icon: LayoutGrid,
             },
             {
-                title: 'Clients',
-                href: '/admin/clients',
+                title: 'Users',
+                href: '/admin/users',
                 icon: Users,
             },
             {
@@ -79,11 +79,11 @@ const getNavItemsForRole = (role?: string): NavItem[] => {
                 href: '/admitting/patients',
                 icon: Users,
             },
-            {
-                title: 'Admissions',
-                href: '/admitting/admissions',
-                icon: ClipboardList,
-            },
+            // {
+            //     title: 'Admissions',
+            //     href: '/admitting/admissions',
+            //     icon: ClipboardList,
+            // },
             {
                 title: 'Activity Log',
                 href: '/admitting/activity',

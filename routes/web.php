@@ -38,8 +38,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // Admin Dashboard Routes
 Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
-    Route::get('clients', [\App\Http\Controllers\Admin\ClientController::class, 'index'])->name('clients.index');
-    Route::get('clients/{client}', [\App\Http\Controllers\Admin\ClientController::class, 'show'])->name('clients.show');
+    
+    // User Management
+    Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
 });
 
 // Billing Dashboard Routes
