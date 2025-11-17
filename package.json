@@ -23,7 +23,8 @@
         "prettier": "^3.4.2",
         "prettier-plugin-organize-imports": "^4.1.0",
         "prettier-plugin-tailwindcss": "^0.6.11",
-        "typescript-eslint": "^8.23.0"
+        "typescript-eslint": "^8.23.0",
+        "vite-plugin-static-copy": "^3.1.4"
     },
     "dependencies": {
         "@headlessui/react": "^2.2.0",
@@ -54,7 +55,7 @@
         "input-otp": "^1.4.2",
         "laravel-vite-plugin": "^2.0",
         "lucide-react": "^0.475.0",
-        "pdfjs-dist": "^5.4.394",
+        "pdfjs-dist": "^5.4.296",
         "qrcode": "^1.5.4",
         "react": "^19.2.0",
         "react-dom": "^19.2.0",

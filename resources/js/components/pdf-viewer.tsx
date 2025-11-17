@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Download } from 'lucide-react';
 
-// Set up PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+// Configure PDF.js worker
+pdfjs.GlobalWorkerOptions.workerSrc = '/build/pdfjs/pdf.worker.js';
 
 interface PDFViewerProps {
     fileUrl: string;
@@ -15,10 +17,17 @@ export function PDFViewer({ fileUrl, fileName }: PDFViewerProps) {
     const [numPages, setNumPages] = useState<number>(0);
     const [pageNumber, setPageNumber] = useState<number>(1);
     const [scale, setScale] = useState<number>(1.0);
+    const [loading, setLoading] = useState<boolean>(true);
 
     function onDocumentLoadSuccess({ numPages }: { numPages: number }): void {
         setNumPages(numPages);
         setPageNumber(1);
+        setLoading(false);
+    }
+
+    function onDocumentLoadError(error: Error): void {
+        console.error('Error loading PDF:', error);
+        setLoading(false);
     }
 
     function changePage(offset: number) {
@@ -50,39 +59,41 @@ export function PDFViewer({ fileUrl, fileName }: PDFViewerProps) {
                         variant="outline"
                         size="sm"
                         onClick={previousPage}
-                        disabled={pageNumber <= 1}
+                        disabled={pageNumber <= 1 || loading}
                     >
                         <ChevronLeft className="size-4" />
                     </Button>
                     <span className="text-sm">
-                        Page {pageNumber} of {numPages}
+                        Page {pageNumber} of {numPages || '?'}
                     </span>
                     <Button
                         variant="outline"
                         size="sm"
                         onClick={nextPage}
-                        disabled={pageNumber >= numPages}
+                        disabled={pageNumber >= numPages || loading}
                     >
                         <ChevronRight className="size-4" />
                     </Button>
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={zoomOut}>
+                    <Button variant="outline" size="sm" onClick={zoomOut} disabled={loading}>
                         <ZoomOut className="size-4" />
                     </Button>
                     <span className="text-sm">{Math.round(scale * 100)}%</span>
-                    <Button variant="outline" size="sm" onClick={zoomIn}>
+                    <Button variant="outline" size="sm" onClick={zoomIn} disabled={loading}>
                         <ZoomIn className="size-4" />
                     </Button>
                 </div>
 
-                <Button variant="outline" size="sm" asChild>
-                    <a href={fileUrl} download={fileName || 'document.pdf'}>
-                        <Download className="mr-1 size-4" />
-                        Download
-                    </a>
-                </Button>
+                {fileUrl && (
+                    <Button variant="outline" size="sm" asChild>
+                        <a href={fileUrl} download={fileName || 'document.pdf'}>
+                            <Download className="mr-1 size-4" />
+                            Download
+                        </a>
+                    </Button>
+                )}
             </div>
 
             {/* PDF Display */}
@@ -91,25 +102,29 @@ export function PDFViewer({ fileUrl, fileName }: PDFViewerProps) {
                     <Document
                         file={fileUrl}
                         onLoadSuccess={onDocumentLoadSuccess}
+                        onLoadError={onDocumentLoadError}
                         loading={
                             <div className="flex h-96 items-center justify-center">
                                 <div className="text-center">
-                                    <div className="mb-2 size-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+                                    <div className="mb-2 size-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto"></div>
                                     <p className="text-sm text-muted-foreground">Loading PDF...</p>
                                 </div>
                             </div>
                         }
                         error={
                             <div className="flex h-96 items-center justify-center">
-                                <p className="text-sm text-destructive">Failed to load PDF</p>
+                                <div className="text-center">
+                                    <p className="text-sm text-destructive font-medium">Failed to load PDF</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Please try again or use a different file</p>
+                                </div>
                             </div>
                         }
                     >
                         <Page
                             pageNumber={pageNumber}
                             scale={scale}
-                            renderTextLayer={false}
-                            renderAnnotationLayer={false}
+                            renderTextLayer={true}
+                            renderAnnotationLayer={true}
                         />
                     </Document>
                 </div>

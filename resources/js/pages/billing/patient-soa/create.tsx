@@ -16,7 +16,7 @@ import InputError from '@/components/input-error';
 import { Spinner } from '@/components/ui/spinner';
 import { FileText, QrCode, Upload, Search, Eye, X } from 'lucide-react';
 import { useState, useMemo, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { PDFViewer } from '@/components/pdf-viewer';
 import { toast } from 'react-toastify';
 
@@ -350,11 +350,14 @@ export default function CreatePatientSOA() {
 
                 {/* Preview Dialog */}
                 <Dialog open={showPreview} onOpenChange={setShowPreview}>
-                    <DialogContent className="max-w-4xl max-h-[90vh]">
+                    <DialogContent className="w-[95vw] max-w-5xl lg:max-w-6xl max-h-[92vh]">
                         <DialogHeader>
                             <DialogTitle>Statement Preview</DialogTitle>
+                            <DialogDescription>
+                                Preview the uploaded statement document before creating the SOA
+                            </DialogDescription>
                         </DialogHeader>
-                        <div className="overflow-auto max-h-[calc(90vh-8rem)]">
+                        <div className="overflow-auto h-[calc(92vh-7rem)]">
                             {fileType === 'pdf' && previewUrl && (
                                 <PDFViewer fileUrl={previewUrl} />
                             )}
