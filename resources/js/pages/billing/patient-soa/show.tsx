@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { useEffect, useRef, useState } from 'react';
 import QRCode from 'qrcode';
 import { PDFViewer } from '@/components/pdf-viewer';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface PatientSOA {
     id: number;
@@ -149,10 +150,10 @@ export default function ShowPatientSOA() {
                                         <Button 
                                             variant="outline" 
                                             className="w-full"
-                                            onClick={() => setShowPreview(!showPreview)}
+                                            onClick={() => setShowPreview(true)}
                                         >
                                             <Eye className="mr-2 size-4" />
-                                            {showPreview ? 'Hide Preview' : `Preview ${soa.file_type === 'image' ? 'Image' : 'PDF'}`}
+                                            {`Preview ${soa.file_type === 'image' ? 'Image' : 'PDF'}`}
                                         </Button>
                                         <Button className="w-full" asChild>
                                             <a
@@ -221,35 +222,41 @@ export default function ShowPatientSOA() {
                     </Card>
                 </div>
 
-                {/* Document Preview Section */}
-                {showPreview && soa.soa_attach && (
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>
+                {/* Document Preview Modal */}
+                <Dialog open={showPreview} onOpenChange={setShowPreview}>
+                    <DialogContent className="w-[95vw] max-w-5xl lg:max-w-6xl max-h-[92vh]">
+                        <DialogHeader>
+                            <DialogTitle>
                                 {soa.file_type === 'image' ? 'Image Preview' : 'PDF Preview'}
-                            </CardTitle>
-                            <CardDescription>
-                                Interactive document preview
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            {soa.file_type === 'image' ? (
-                                <div className="flex justify-center">
-                                    <img 
-                                        src={`/storage/${soa.soa_attach}`}
-                                        alt={`SOA for ${soa.patient_name}`}
-                                        className="max-w-full h-auto rounded-lg border"
+                            </DialogTitle>
+                            <DialogDescription>
+                                Interactive document preview for {soa.patient_name}
+                            </DialogDescription>
+                        </DialogHeader>
+                        {soa.soa_attach ? (
+                            <div className="overflow-auto h-[calc(92vh-7rem)]">
+                                {soa.file_type === 'image' ? (
+                                    <div className="flex justify-center">
+                                        <img
+                                            src={`/storage/${soa.soa_attach}`}
+                                            alt={`SOA for ${soa.patient_name}`}
+                                            className="max-w-full h-auto rounded-lg border"
+                                        />
+                                    </div>
+                                ) : (
+                                    <PDFViewer
+                                        fileUrl={`/storage/${soa.soa_attach}`}
+                                        fileName={`SOA-${soa.patient_name}.pdf`}
                                     />
-                                </div>
-                            ) : (
-                                <PDFViewer 
-                                    fileUrl={`/storage/${soa.soa_attach}`}
-                                    fileName={`SOA-${soa.patient_name}.pdf`}
-                                />
-                            )}
-                        </CardContent>
-                    </Card>
-                )}
+                                )}
+                            </div>
+                        ) : (
+                            <p className="text-sm text-muted-foreground">
+                                No attachment available for preview.
+                            </p>
+                        )}
+                    </DialogContent>
+                </Dialog>
 
                 {/* Timestamps */}
                 <Card>
