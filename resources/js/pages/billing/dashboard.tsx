@@ -3,6 +3,8 @@ import { type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { CreditCard, DollarSign, FileText, Clock, Receipt } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useMemo, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -18,37 +20,59 @@ interface DashboardStats {
     total_amount_due: number;
 }
 
+interface PatientBill {
+    id: number;
+    patient_name: string;
+    amount: number;
+    created_at: string;
+}
+
 export default function BillingDashboard() {
-    const { stats } = usePage<{ stats: DashboardStats }>().props;
+    const { stats, patientBills: patientBillsProp } = usePage<{ stats: DashboardStats; patientBills: PatientBill[] }>().props;
+    const patientBills = patientBillsProp ?? [];
+    const [showInsights, setShowInsights] = useState(false);
+
+    const currencyFormatter = useMemo(
+        () =>
+            new Intl.NumberFormat('en-PH', {
+                style: 'currency',
+                currency: 'PHP',
+                minimumFractionDigits: 2,
+            }),
+        []
+    );
+
+    const formatCurrency = (value: number) => currencyFormatter.format(value ?? 0);
 
     const statsCards = [
         {
             title: 'Total Invoices',
-            value: stats.total_invoices,
+            value: stats.total_invoices.toLocaleString(),
             description: 'All time invoices',
             icon: FileText,
             color: 'text-blue-600 dark:text-blue-400',
         },
         {
             title: 'Pending Invoices',
-            value: stats.pending_invoices,
+            value: stats.pending_invoices.toLocaleString(),
             description: 'Awaiting payment',
             icon: Clock,
             color: 'text-orange-600 dark:text-orange-400',
         },
         {
             title: 'Paid Invoices',
-            value: stats.paid_invoices,
+            value: stats.paid_invoices.toLocaleString(),
             description: 'Successfully paid',
             icon: CreditCard,
             color: 'text-green-600 dark:text-green-400',
         },
         {
-            title: 'Amount Due',
-            value: `$${stats.total_amount_due.toFixed(2)}`,
-            description: 'Total outstanding',
+            title: 'All Patients Amount Due',
+            value: formatCurrency(stats.total_amount_due),
+            description: 'Total outstanding across every patient',
             icon: DollarSign,
             color: 'text-red-600 dark:text-red-400',
+            actionable: true,
         },
     ];
 
@@ -91,7 +115,20 @@ export default function BillingDashboard() {
                     {statsCards.map((stat) => {
                         const Icon = stat.icon;
                         return (
-                            <Card key={stat.title}>
+                            <Card
+                                key={stat.title}
+                                onClick={stat.actionable ? () => setShowInsights(true) : undefined}
+                                className={stat.actionable ? 'cursor-pointer transition hover:shadow-md' : ''}
+                                role={stat.actionable ? 'button' : undefined}
+                                tabIndex={stat.actionable ? 0 : undefined}
+                                onKeyDown={(event) => {
+                                    if (!stat.actionable) return;
+                                    if (event.key === 'Enter' || event.key === ' ') {
+                                        event.preventDefault();
+                                        setShowInsights(true);
+                                    }
+                                }}
+                            >
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                     <CardTitle className="text-sm font-medium">
                                         {stat.title}
@@ -163,6 +200,51 @@ export default function BillingDashboard() {
                     </CardContent>
                 </Card>
             </div>
+
+            <Dialog open={showInsights} onOpenChange={setShowInsights}>
+                <DialogContent className="max-w-4xl">
+                    <DialogHeader>
+                        <DialogTitle>Patient Bills Insights</DialogTitle>
+                        <DialogDescription>
+                            Detailed list of every patient bill contributing to the total amount
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    {patientBills.length ? (
+                        <div className="overflow-x-auto">
+                            <table className="w-full table-auto text-sm">
+                                <thead>
+                                    <tr className="text-left text-muted-foreground">
+                                        <th className="px-3 py-2">#</th>
+                                        <th className="px-3 py-2">Patient</th>
+                                        <th className="px-3 py-2 text-right">Amount</th>
+                                        <th className="px-3 py-2">Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {patientBills.map((bill, index) => (
+                                        <tr key={bill.id} className="border-t">
+                                            <td className="px-3 py-2 text-muted-foreground">{index + 1}</td>
+                                            <td className="px-3 py-2 font-medium">{bill.patient_name}</td>
+                                            <td className="px-3 py-2 text-right font-semibold">{formatCurrency(bill.amount)}</td>
+                                            <td className="px-3 py-2 text-muted-foreground">
+                                                {bill.created_at ? new Date(bill.created_at).toLocaleString() : '—'}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                            <div className="mt-4 text-right text-sm text-muted-foreground">
+                                Total: <span className="font-semibold text-foreground">{formatCurrency(stats.total_amount_due)}</span>
+                            </div>
+                        </div>
+                    ) : (
+                        <p className="text-sm text-muted-foreground">
+                            There are no patient bills recorded yet.
+                        </p>
+                    )}
+                </DialogContent>
+            </Dialog>
         </AppLayout>
     );
 }

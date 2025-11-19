@@ -40,10 +40,16 @@ export default function PublicSOAView({ soa }: Props) {
                 <div className="mx-auto max-w-4xl space-y-6">
                     {/* Header */}
                     <div className="text-center space-y-2">
+                                <div className="flex justify-center">
+                                <img
+                                    src="/acelogo2.png"
+                                    alt="ACE Logo"
+                                    className="h-20 w-auto"
+                                />
+                                </div>
                         <div className="flex items-center justify-center gap-2">
-                            <Building className="size-8 text-primary" />
-                            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
-                                Hospital Billing System
+                        <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
+                                ACE Medical Center Tuguegarao
                             </h1>
                         </div>
                         <p className="text-muted-foreground text-lg">
@@ -227,7 +233,7 @@ export default function PublicSOAView({ soa }: Props) {
                             This is a secure link. Do not share this link with others.
                         </p>
                         <p className="text-xs text-muted-foreground">
-                            © 2025 Hospital Billing System. All rights reserved.
+                            © 2025 ACE Medical Center Tuguegarao Billing. All rights reserved.
                         </p>
                     </div>
                 </div>

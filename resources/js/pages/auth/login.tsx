@@ -9,6 +9,8 @@ import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
 import { Form, Head } from '@inertiajs/react';
+import { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface LoginProps {
     status?: string;
@@ -21,6 +23,8 @@ export default function Login({
     canResetPassword,
     canRegister,
 }: LoginProps) {
+    const [showPassword, setShowPassword] = useState(false);
+
     return (
         <>
             <Head title="Log in" />
@@ -37,7 +41,7 @@ export default function Login({
                             />
                         </div>
                         <h1 className="text-2xl font-bold text-gray-900">
-                            ACE Billing & Admission
+                            ACEMCT Billing & Admission
                         </h1>
                         <p className="mt-2 text-sm text-gray-600">
                             Sign in to access your account
@@ -89,16 +93,32 @@ export default function Login({
                                                     </TextLink>
                                                 )}
                                             </div>
-                                            <Input
-                                                id="password"
-                                                type="password"
-                                                name="password"
-                                                required
-                                                tabIndex={2}
-                                                autoComplete="current-password"
-                                                placeholder="Password"
-                                                className="h-11"
-                                            />
+                                            <div className="relative">
+                                                <Input
+                                                    id="password"
+                                                    type={showPassword ? 'text' : 'password'}
+                                                    name="password"
+                                                    required
+                                                    tabIndex={2}
+                                                    autoComplete="current-password"
+                                                    placeholder="Password"
+                                                    className="h-11 pr-12"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowPassword((prev) => !prev)}
+                                                    className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+                                                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                                    aria-pressed={showPassword}
+                                                    tabIndex={2}
+                                                >
+                                                    {showPassword ? (
+                                                        <EyeOff className="size-4" />
+                                                    ) : (
+                                                        <Eye className="size-4" />
+                                                    )}
+                                                </button>
+                                            </div>
                                             <InputError message={errors.password} />
                                         </div>
 

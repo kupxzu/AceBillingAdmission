@@ -36,14 +36,17 @@ class PatientController extends Controller
 
         // Load doctor assignments for each patient
         $patients->getCollection()->transform(function ($patient) {
-            $attendingAssignment = PtAttendingDoctor::where('patient_id', $patient->id)
+            $attendingAssignments = PtAttendingDoctor::where('patient_id', $patient->id)
                 ->with('doctor')
-                ->first();
+                ->get();
             $admittingAssignment = PtAdmittingDoctor::where('patient_id', $patient->id)
                 ->with('doctor')
                 ->first();
 
-            $patient->attending_doctor = $attendingAssignment?->doctor?->fullname;
+            $patient->attending_doctor = $attendingAssignments
+                ->map(fn ($assignment) => $assignment->doctor?->fullname)
+                ->filter()
+                ->implode(', ');
             $patient->admitting_doctor = $admittingAssignment?->doctor?->fullname;
 
             return $patient;
@@ -169,7 +172,7 @@ class PatientController extends Controller
         $attendingDoctors = DocAttending::all();
         $admittingDoctors = DocAdmitting::all();
 
-        $currentAttending = PtAttendingDoctor::where('patient_id', $patient->id)->first();
+        $currentAttending = PtAttendingDoctor::where('patient_id', $patient->id)->get();
         $currentAdmitting = PtAdmittingDoctor::where('patient_id', $patient->id)->first();
 
         return Inertia::render('admitting/patients/assign-doctors', [
@@ -177,8 +180,8 @@ class PatientController extends Controller
             'attendingDoctors' => $attendingDoctors,
             'admittingDoctors' => $admittingDoctors,
             'currentAssignments' => [
-                'attending' => $currentAttending,
-                'admitting' => $currentAdmitting,
+                'attending_ids' => $currentAttending->pluck('attending_doctor')->map(fn ($id) => (int) $id)->values(),
+                'admitting_id' => $currentAdmitting?->admitting_doctor,
             ],
         ]);
     }
@@ -189,16 +192,23 @@ class PatientController extends Controller
     public function storeAssignDoctors(Request $request, Patient $patient)
     {
         $validated = $request->validate([
-            'attending_doctor_id' => 'nullable|exists:doc_attendings,id',
+            'attending_doctor_ids' => 'nullable|array',
+            'attending_doctor_ids.*' => 'exists:doc_attendings,id',
             'admitting_doctor_id' => 'nullable|exists:doc_admittings,id',
         ]);
 
-        // Update or create attending doctor assignment
-        if (!empty($validated['attending_doctor_id'])) {
-            PtAttendingDoctor::updateOrCreate(
-                ['patient_id' => $patient->id],
-                ['attending_doctor' => $validated['attending_doctor_id']]
-            );
+        // Replace attending doctor assignments
+        PtAttendingDoctor::where('patient_id', $patient->id)->delete();
+
+        $attendingDoctorIds = collect($validated['attending_doctor_ids'] ?? [])
+            ->filter()
+            ->unique();
+
+        foreach ($attendingDoctorIds as $doctorId) {
+            PtAttendingDoctor::create([
+                'patient_id' => $patient->id,
+                'attending_doctor' => $doctorId,
+            ]);
         }
 
         // Update or create admitting doctor assignment
@@ -207,6 +217,9 @@ class PatientController extends Controller
                 ['patient_id' => $patient->id],
                 ['admitting_doctor' => $validated['admitting_doctor_id']]
             );
+        } else {
+            // Allow clearing admitting doctor assignment
+            PtAdmittingDoctor::where('patient_id', $patient->id)->delete();
         }
 
         return redirect()->route('admitting.patients.index')

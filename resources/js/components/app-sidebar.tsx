@@ -29,16 +29,16 @@ const getNavItemsForRole = (role?: string): NavItem[] => {
                 href: '/billing/patient-soa',
                 icon: Receipt,
             },
-            {
-                title: 'My Invoices',
-                href: '/billing/invoices',
-                icon: FileText,
-            },
-            {
-                title: 'Payments',
-                href: '/billing/payments',
-                icon: CreditCard,
-            },
+            // {
+            //     title: 'My Invoices',
+            //     href: '/billing/invoices',
+            //     icon: FileText,
+            // },
+            // {
+            //     title: 'Payments',
+            //     href: '/billing/payments',
+            //     icon: CreditCard,
+            // },
         ];
     }
 
@@ -59,16 +59,16 @@ const getNavItemsForRole = (role?: string): NavItem[] => {
                 href: '/admin/activity-logs',
                 icon: Activity,
             },
-            {
-                title: 'All Invoices',
-                href: '/admin/invoices',
-                icon: FileText,
-            },
-            {
-                title: 'Settings',
-                href: '/admin/settings',
-                icon: Settings,
-            },
+            // {
+            //     title: 'All Invoices',
+            //     href: '/admin/invoices',
+            //     icon: FileText,
+            // },
+            // {
+            //     title: 'Settings',
+            //     href: '/admin/settings',
+            //     icon: Settings,
+            // },
         ];
     }
 

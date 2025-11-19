@@ -146,7 +146,7 @@ export default function CreatePatient() {
                                                 <SelectItem value="II">II</SelectItem>
                                                 <SelectItem value="III">III</SelectItem>
                                                 <SelectItem value="IV">IV</SelectItem>
-                                                <SelectItem value="custom">Custom (type your own)</SelectItem>
+                                                <SelectItem value="custom">Custom (add extension name)</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     ) : (

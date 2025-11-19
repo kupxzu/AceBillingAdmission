@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select';
 import InputError from '@/components/input-error';
 import { Spinner } from '@/components/ui/spinner';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Stethoscope, UserCog } from 'lucide-react';
 import { toast } from 'react-toastify';
 
@@ -29,11 +30,9 @@ interface Doctor {
     fullname: string;
 }
 
-interface Assignment {
-    id: number;
-    patient_id: number;
-    attending_doctor?: number;
-    admitting_doctor?: number;
+interface CurrentAssignments {
+    attending_ids?: number[];
+    admitting_id?: number | null;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -56,16 +55,26 @@ export default function AssignDoctors() {
         patient: Patient;
         attendingDoctors: Doctor[];
         admittingDoctors: Doctor[];
-        currentAssignments: {
-            attending: Assignment | null;
-            admitting: Assignment | null;
-        };
+        currentAssignments: CurrentAssignments;
     }>().props;
 
     const { data, setData, post, processing, errors } = useForm({
-        attending_doctor_id: currentAssignments.attending?.attending_doctor?.toString() || '',
-        admitting_doctor_id: currentAssignments.admitting?.admitting_doctor?.toString() || '',
+        attending_doctor_ids:
+            currentAssignments.attending_ids?.map((value) => value.toString()) || [],
+        admitting_doctor_id: currentAssignments.admitting_id?.toString() || '',
     });
+
+    const selectedAttendingDoctors = data.attending_doctor_ids;
+
+    const toggleAttendingDoctor = (doctorId: string, checked: boolean | 'indeterminate') => {
+        const isChecked = checked === true;
+        setData(
+            'attending_doctor_ids',
+            isChecked
+                ? Array.from(new Set([...selectedAttendingDoctors, doctorId]))
+                : selectedAttendingDoctors.filter((id) => id !== doctorId)
+        );
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -116,30 +125,37 @@ export default function AssignDoctors() {
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="attending_doctor_id">
-                                        Attending Doctor
-                                    </Label>
-                                    <Select
-                                        value={data.attending_doctor_id}
-                                        onValueChange={(value) =>
-                                            setData('attending_doctor_id', value)
-                                        }
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select attending doctor" />
-                                        </SelectTrigger>
-                                        <SelectContent>
+                                    <Label>Attending Doctors</Label>
+                                    <div className="rounded-md border p-3">
+                                        <div className="max-h-60 space-y-2 overflow-auto pr-2">
                                             {attendingDoctors.map((doctor) => (
-                                                <SelectItem
+                                                <label
                                                     key={doctor.id}
-                                                    value={doctor.id.toString()}
+                                                    className="flex items-center gap-2 text-sm"
                                                 >
-                                                    {doctor.fullname}
-                                                </SelectItem>
+                                                    <Checkbox
+                                                        id={`attending-${doctor.id}`}
+                                                        checked={selectedAttendingDoctors.includes(
+                                                            doctor.id.toString()
+                                                        )}
+                                                        onCheckedChange={(checked) =>
+                                                            toggleAttendingDoctor(
+                                                                doctor.id.toString(),
+                                                                checked
+                                                            )
+                                                        }
+                                                    />
+                                                    <span>{doctor.fullname}</span>
+                                                </label>
                                             ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <InputError message={errors.attending_doctor_id} />
+                                        </div>
+                                        {selectedAttendingDoctors.length === 0 && (
+                                            <p className="pt-3 text-xs text-muted-foreground">
+                                                Select one or more attending doctors to assign.
+                                            </p>
+                                        )}
+                                    </div>
+                                    <InputError message={errors.attending_doctor_ids} />
                                 </div>
 
                                 <div className="flex gap-2">
@@ -176,15 +192,18 @@ export default function AssignDoctors() {
                                         Admitting Doctor
                                     </Label>
                                     <Select
-                                        value={data.admitting_doctor_id}
+                                        value={data.admitting_doctor_id || 'none'}
                                         onValueChange={(value) =>
-                                            setData('admitting_doctor_id', value)
+                                            setData('admitting_doctor_id', value === 'none' ? '' : value)
                                         }
                                     >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select admitting doctor" />
                                         </SelectTrigger>
                                         <SelectContent>
+                                            <SelectItem value="none">
+                                                No admitting doctor
+                                            </SelectItem>
                                             {admittingDoctors.map((doctor) => (
                                                 <SelectItem
                                                     key={doctor.id}

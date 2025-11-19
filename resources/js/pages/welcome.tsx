@@ -23,9 +23,13 @@ export default function Welcome({
                 {/* Navigation */}
                 <header className="w-full border-b">
                     <nav className="container mx-auto flex items-center justify-between px-6 py-4">
-                        <div className="flex items-center gap-2">
-                            <FileText className="size-6 text-primary" />
-                            <span className="text-xl font-bold">Ace Billing</span>
+                        <div className="flex items-center gap-3">
+                            <img
+                                src="/acelogo2.png"
+                                alt="ACE Logo"
+                                className="h-10 w-auto"
+                            />
+                            <span className="text-xl font-bold">ACEMCT BILLING SYSTEM</span>
                         </div>
                         <div className="flex items-center gap-3">
                             {auth.user ? (
@@ -62,7 +66,7 @@ export default function Welcome({
                 <main className="container mx-auto flex flex-1 flex-col items-center justify-center px-6 py-16 text-center">
                     <div className="mb-12 max-w-3xl">
                         <h1 className="mb-4 text-5xl font-bold tracking-tight lg:text-6xl">
-                            ACE Billing e-SOA
+                            ACEMCT Billing e-SOA
                         </h1>
 
                         <div className="flex flex-wrap items-center justify-center gap-4">
@@ -97,26 +101,13 @@ export default function Welcome({
                     </div>
 
                     {/* Features Grid */}
-                    <div className="grid w-full max-w-5xl gap-6 md:grid-cols-2 lg:grid-cols-4">
-                        <div className="rounded-lg border bg-card p-6 text-center">
-                            <FileText className="mx-auto mb-4 size-10 text-primary" />
-                            <h3 className="mb-2 font-semibold">Invoice Management</h3>
-                            <p className="text-sm text-muted-foreground">
-                                Create and track professional invoices
-                            </p>
-                        </div>
+                    <div className="grid w-full max-w-5xl gap-6 md:grid-cols-2 lg:grid-cols-2">
+
                         <div className="rounded-lg border bg-card p-6 text-center">
                             <CreditCard className="mx-auto mb-4 size-10 text-primary" />
-                            <h3 className="mb-2 font-semibold">Payment Tracking</h3>
+                            <h3 className="mb-2 font-semibold">Bills Tracking</h3>
                             <p className="text-sm text-muted-foreground">
-                                Monitor payments and outstanding balances
-                            </p>
-                        </div>
-                        <div className="rounded-lg border bg-card p-6 text-center">
-                            <Users className="mx-auto mb-4 size-10 text-primary" />
-                            <h3 className="mb-2 font-semibold">Client Management</h3>
-                            <p className="text-sm text-muted-foreground">
-                                Organize and manage all your clients
+                                Monitor bills and outstanding balances
                             </p>
                         </div>
                         <div className="rounded-lg border bg-card p-6 text-center">
@@ -132,7 +123,7 @@ export default function Welcome({
                 {/* Footer */}
                 <footer className="border-t py-6">
                     <div className="container mx-auto px-6 text-center text-sm text-muted-foreground">
-                        &copy; {new Date().getFullYear()} AceBilling. All rights reserved.
+                        &copy; {new Date().getFullYear()} ACE Medical Center Tuguegarao Billing. All rights reserved.
                     </div>
                 </footer>
             </div>
