@@ -23,7 +23,7 @@ class PatientSOAController extends Controller
             });
         }
 
-        $soas = $query->latest()->paginate(10)->withQueryString();
+        $soas = $query->latest()->paginate(20)->withQueryString();
 
         $soas->getCollection()->transform(function ($soa) {
             $soa->patient_name = $soa->patient 
@@ -74,6 +74,12 @@ class PatientSOAController extends Controller
 
         if ($request->hasFile('soa_attach')) {
             $validated['soa_attach'] = $request->file('soa_attach')->store('soa', 'public');
+        }
+
+        if (empty($validated['soa_link'])) {
+            $token = $validated['patient_id'] . '-' . now()->timestamp;
+            $baseUrl = rtrim(config('app.url') ?? url('/'), '/');
+            $validated['soa_link'] = $baseUrl . '/soa/view/' . $token;
         }
 
         PatientSoa::create($validated);

@@ -13,7 +13,7 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, FileText, CreditCard, Users, Settings, Activity, ClipboardList, Receipt } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, FileText, CreditCard, Users, Settings, Activity, ClipboardList, Receipt, TicketCheck } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const getNavItemsForRole = (role?: string): NavItem[] => {
@@ -107,15 +107,15 @@ const getNavItemsForRole = (role?: string): NavItem[] => {
 };
 
 const footerNavItems: NavItem[] = [
+    // {
+    //     title: 'Repository',
+    //     href: 'https://github.com/laravel/react-starter-kit',
+    //     icon: Folder,
+    // },
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
+        title: 'Create Ticket',
+        href: 'http://172.16.1.5:8000/',
+        icon: TicketCheck,
     },
 ];
 

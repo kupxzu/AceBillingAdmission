@@ -62,6 +62,8 @@ interface PaginatedSOA {
     per_page: number;
     total: number;
     links: PaginationLink[];
+    from?: number;
+    to?: number;
 }
 
 export default function PatientSOAIndex() {
@@ -310,7 +312,7 @@ export default function PatientSOAIndex() {
                         {soas.last_page > 1 && (
                             <div className="mt-4 flex items-center justify-between">
                                 <div className="text-sm text-muted-foreground">
-                                    Showing {soas.data.length} of {soas.total} statements
+                                    Showing {soas.from ?? 0}-{soas.to ?? soas.data.length} of {soas.total} statements
                                 </div>
                                 <div className="flex gap-2">
                                     {soas.links.map((link, index) => (

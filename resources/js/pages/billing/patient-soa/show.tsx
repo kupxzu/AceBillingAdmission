@@ -42,6 +42,27 @@ export default function ShowPatientSOA() {
     const qrCanvasRef = useRef<HTMLCanvasElement>(null);
     const [showPreview, setShowPreview] = useState(false);
 
+    const overlayLogoOnQr = (canvas: HTMLCanvasElement) => {
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            return;
+        }
+
+        const logo = new Image();
+        logo.crossOrigin = 'anonymous';
+        logo.src = '/acelogo2.png';
+
+        logo.onload = () => {
+            const logoSize = canvas.width * 0.25;
+            const x = (canvas.width - logoSize) / 2;
+            const y = (canvas.height - logoSize) / 2;
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(x, y, logoSize, logoSize);
+            ctx.drawImage(logo, x, y, logoSize, logoSize);
+        };
+    };
+
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
@@ -66,7 +87,14 @@ export default function ShowPatientSOA() {
                     },
                 },
                 (error) => {
-                    if (error) console.error('Error generating QR code:', error);
+                    if (error) {
+                        console.error('Error generating QR code:', error);
+                        return;
+                    }
+
+                    if (qrCanvasRef.current) {
+                        overlayLogoOnQr(qrCanvasRef.current);
+                    }
                 }
             );
         }

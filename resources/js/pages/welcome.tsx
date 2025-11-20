@@ -66,7 +66,7 @@ export default function Welcome({
                 <main className="container mx-auto flex flex-1 flex-col items-center justify-center px-6 py-16 text-center">
                     <div className="mb-12 max-w-3xl">
                         <h1 className="mb-4 text-5xl font-bold tracking-tight lg:text-6xl">
-                            ACEMCT Billing e-SOA
+                            ACEMCT Billing eSOA
                         </h1>
 
                         <div className="flex flex-wrap items-center justify-center gap-4">

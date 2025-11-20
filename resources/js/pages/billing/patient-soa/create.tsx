@@ -107,20 +107,6 @@ export default function CreatePatientSOA() {
         }
     };
 
-    const handlePreviewClose = () => {
-        setShowPreview(false);
-    };
-
-    const generateQRLink = () => {
-        if (!data.patient_id) {
-            toast.warning('Please select a patient first');
-            return;
-        }
-        const baseUrl = window.location.origin;
-        const uniqueLink = `${baseUrl}/soa/view/${data.patient_id}-${Date.now()}`;
-        setData('soa_link', uniqueLink);
-        toast.success('QR Code link generated successfully!');
-    };
 
     // Cleanup blob URLs on unmount
     useEffect(() => {
@@ -288,25 +274,14 @@ export default function CreatePatientSOA() {
                             {/* QR Code Link */}
                             <div className="space-y-2">
                                 <Label htmlFor="soa_link">QR Code Link</Label>
-                                <div className="flex gap-2">
-                                    <Input
-                                        id="soa_link"
-                                        value={data.soa_link}
-                                        onChange={(e) => setData('soa_link', e.target.value)}
-                                        placeholder="https://example.com/soa/view/123"
-                                        readOnly
-                                    />
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={generateQRLink}
-                                    >
-                                        <QrCode className="mr-2 size-4" />
-                                        Generate
-                                    </Button>
-                                </div>
+                                <Input
+                                    id="soa_link"
+                                    value={data.soa_link}
+                                    readOnly
+                                    placeholder="Link will be generated automatically after saving"
+                                />
                                 <p className="text-xs text-muted-foreground">
-                                    Generate a unique link that patients can scan via QR code to view their SOA
+                                    A secure QR link is generated automatically once the SOA is created.
                                 </p>
                                 <InputError message={errors.soa_link} />
                             </div>
