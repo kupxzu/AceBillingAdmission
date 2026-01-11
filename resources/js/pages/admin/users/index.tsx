@@ -158,7 +158,6 @@ export default function UsersIndex() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">All Roles</SelectItem>
-                                    <SelectItem value="admin">Admin</SelectItem>
                                     <SelectItem value="billing">Billing</SelectItem>
                                     <SelectItem value="admitting">Admitting</SelectItem>
                                 </SelectContent>

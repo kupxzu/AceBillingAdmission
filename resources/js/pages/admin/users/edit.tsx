@@ -12,9 +12,19 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import InputError from '@/components/input-error';
 import { Spinner } from '@/components/ui/spinner';
 import { toast } from 'react-toastify';
+import { Mail, AlertTriangle, Loader2 } from 'lucide-react';
+import { useState } from 'react';
 
 interface UserData {
     id: number;
@@ -40,13 +50,13 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function EditUser() {
     const { user } = usePage<{ user: UserData }>().props;
+    const [sendingPassword, setSendingPassword] = useState(false);
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
 
     const { data, setData, put, processing, errors } = useForm({
         name: user.name || '',
         email: user.email || '',
         role: user.role || 'billing',
-        password: '',
-        password_confirmation: '',
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -57,6 +67,21 @@ export default function EditUser() {
             },
             onError: () => {
                 toast.error('Failed to update user. Please check the form.');
+            },
+        });
+    };
+
+    const handleSendNewPassword = () => {
+        setSendingPassword(true);
+        router.post(`/admin/users/${user.id}/reset-password`, {}, {
+            onSuccess: () => {
+                toast.success('New password has been sent to the user\'s email!');
+                setSendingPassword(false);
+                setShowPasswordModal(false);
+            },
+            onError: () => {
+                toast.error('Failed to send new password. Please try again.');
+                setSendingPassword(false);
             },
         });
     };
@@ -152,41 +177,75 @@ export default function EditUser() {
                             </div>
 
                             <div className="border-t pt-6">
-                                <h3 className="text-lg font-semibold mb-4">Change Password (Optional)</h3>
+                                <h3 className="text-lg font-semibold mb-2">Password Reset</h3>
                                 <p className="text-sm text-muted-foreground mb-4">
-                                    Leave blank to keep the current password
+                                    Send a new randomized password to the user's email address
                                 </p>
 
-                                {/* Password */}
-                                <div className="space-y-2 mb-4">
-                                    <Label htmlFor="password">
-                                        New Password
-                                    </Label>
-                                    <Input
-                                        id="password"
-                                        type="password"
-                                        value={data.password}
-                                        onChange={(e) => setData('password', e.target.value)}
-                                        placeholder="Minimum 8 characters"
-                                    />
-                                    <InputError message={errors.password} />
-                                </div>
-
-                                {/* Confirm Password */}
-                                <div className="space-y-2">
-                                    <Label htmlFor="password_confirmation">
-                                        Confirm New Password
-                                    </Label>
-                                    <Input
-                                        id="password_confirmation"
-                                        type="password"
-                                        value={data.password_confirmation}
-                                        onChange={(e) => setData('password_confirmation', e.target.value)}
-                                        placeholder="Re-enter new password"
-                                    />
-                                    <InputError message={errors.password_confirmation} />
-                                </div>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => setShowPasswordModal(true)}
+                                    className="gap-2"
+                                >
+                                    <Mail className="size-4" />
+                                    Send New Password to Email
+                                </Button>
+                                <p className="text-xs text-muted-foreground mt-2">
+                                    A new password will be generated and sent to: <strong>{user.email}</strong>
+                                </p>
                             </div>
+
+                            {/* Password Reset Confirmation Modal */}
+                            <Dialog open={showPasswordModal} onOpenChange={(open) => !sendingPassword && setShowPasswordModal(open)}>
+                                <DialogContent className="sm:max-w-md">
+                                    <DialogHeader>
+                                        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
+                                            <AlertTriangle className="h-7 w-7 text-amber-600 dark:text-amber-400" />
+                                        </div>
+                                        <DialogTitle className="text-center text-xl">Reset Password</DialogTitle>
+                                        <DialogDescription className="text-center pt-2">
+                                            Are you sure you want to send a new password to{' '}
+                                            <span className="font-semibold text-foreground">{user.email}</span>?
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="rounded-lg border bg-muted/50 p-4 my-2">
+                                        <p className="text-sm text-muted-foreground text-center">
+                                            This will <span className="font-medium text-destructive">replace their current password</span> and send a new randomly generated password to their email address.
+                                        </p>
+                                    </div>
+                                    <DialogFooter className="flex gap-2">
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={() => setShowPasswordModal(false)}
+                                            disabled={sendingPassword}
+                                            className="flex-3 sm:flex-none"
+                                        >
+                                            Cancel
+                                        </Button>
+                                        
+                                        <Button
+                                            type="button"
+                                            onClick={handleSendNewPassword}
+                                            disabled={sendingPassword}
+                                            className="flex-1 sm:flex-none gap-2"
+                                        >
+                                            {sendingPassword ? (
+                                                <>
+                                                    <Loader2 className="size-4 animate-spin" />
+                                                    Sending...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Mail className="size-4" />
+                                                    Send New Password
+                                                </>
+                                            )}
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
 
                             {/* Actions */}
                             <div className="flex gap-2 pt-4">

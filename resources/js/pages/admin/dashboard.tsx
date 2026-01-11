@@ -13,6 +13,21 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import {
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend,
+    ResponsiveContainer,
+    PieChart,
+    Pie,
+    Cell,
+    AreaChart,
+    Area,
+} from 'recharts';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -38,10 +53,33 @@ interface UserData {
     email_verified_at: string | null;
 }
 
+interface MonthlyRegistration {
+    month: string;
+    billing: number;
+    admitting: number;
+}
+
+interface ChartData {
+    name: string;
+    value: number;
+    fill: string;
+    [key: string]: string | number;
+}
+
+const COLORS = {
+    billing: '#3b82f6',
+    admitting: '#06b6d4',
+    verified: '#22c55e',
+    unverified: '#f59e0b',
+};
+
 export default function AdminDashboard() {
-    const { stats, recentUsers } = usePage<{
+    const { stats, recentUsers, monthlyRegistrations, roleDistribution, verificationStatus } = usePage<{
         stats: DashboardStats;
         recentUsers: UserData[];
+        monthlyRegistrations: MonthlyRegistration[];
+        roleDistribution: ChartData[];
+        verificationStatus: ChartData[];
     }>().props;
 
     const statsCards = [
@@ -116,6 +154,164 @@ export default function AdminDashboard() {
                             </Card>
                         );
                     })}
+                </div>
+
+                {/* Charts Section */}
+                <div className="grid gap-6 lg:grid-cols-2">
+                    {/* Monthly Registrations Area Chart */}
+                    <Card className="lg:col-span-2">
+                        <CardHeader>
+                            <CardTitle>User Registrations</CardTitle>
+                            <CardDescription>
+                                Monthly registration trends over the last 6 months
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="h-[300px]">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <AreaChart data={monthlyRegistrations}>
+                                        <defs>
+                                            <linearGradient id="billingGradient" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor={COLORS.billing} stopOpacity={0.3} />
+                                                <stop offset="95%" stopColor={COLORS.billing} stopOpacity={0} />
+                                            </linearGradient>
+                                            <linearGradient id="admittingGradient" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor={COLORS.admitting} stopOpacity={0.3} />
+                                                <stop offset="95%" stopColor={COLORS.admitting} stopOpacity={0} />
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                                        <XAxis dataKey="month" className="text-xs" />
+                                        <YAxis className="text-xs" allowDecimals={false} />
+                                        <Tooltip
+                                            contentStyle={{
+                                                backgroundColor: 'hsl(var(--card))',
+                                                border: '1px solid hsl(var(--border))',
+                                                borderRadius: '8px',
+                                            }}
+                                        />
+                                        <Legend />
+                                        <Area
+                                            type="monotone"
+                                            dataKey="billing"
+                                            name="Billing Staff"
+                                            stroke={COLORS.billing}
+                                            fill="url(#billingGradient)"
+                                            strokeWidth={2}
+                                        />
+                                        <Area
+                                            type="monotone"
+                                            dataKey="admitting"
+                                            name="Admitting Staff"
+                                            stroke={COLORS.admitting}
+                                            fill="url(#admittingGradient)"
+                                            strokeWidth={2}
+                                        />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Role Distribution Pie Chart */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>User Distribution by Role</CardTitle>
+                            <CardDescription>
+                                Breakdown of users by their role
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="h-[280px]">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={roleDistribution}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={60}
+                                            outerRadius={100}
+                                            paddingAngle={5}
+                                            dataKey="value"
+                                            label={({ name, percent }) =>
+                                                `${name} ${((percent ?? 0) * 100).toFixed(0)}%`
+                                            }
+                                        >
+                                            <Cell fill={COLORS.billing} />
+                                            <Cell fill={COLORS.admitting} />
+                                        </Pie>
+                                        <Tooltip
+                                            contentStyle={{
+                                                backgroundColor: 'hsl(var(--card))',
+                                                border: '1px solid hsl(var(--border))',
+                                                borderRadius: '8px',
+                                            }}
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                            <div className="flex justify-center gap-6 mt-4">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS.billing }} />
+                                    <span className="text-sm text-muted-foreground">Billing ({stats.total_billing})</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS.admitting }} />
+                                    <span className="text-sm text-muted-foreground">Admitting ({stats.total_admitting})</span>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Verification Status Pie Chart */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Email Verification Status</CardTitle>
+                            <CardDescription>
+                                Users with verified vs unverified emails
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="h-[280px]">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={verificationStatus}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={60}
+                                            outerRadius={100}
+                                            paddingAngle={5}
+                                            dataKey="value"
+                                            label={({ name, percent }) =>
+                                                `${name} ${((percent ?? 0) * 100).toFixed(0)}%`
+                                            }
+                                        >
+                                            <Cell fill={COLORS.verified} />
+                                            <Cell fill={COLORS.unverified} />
+                                        </Pie>
+                                        <Tooltip
+                                            contentStyle={{
+                                                backgroundColor: 'hsl(var(--card))',
+                                                border: '1px solid hsl(var(--border))',
+                                                borderRadius: '8px',
+                                            }}
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                            <div className="flex justify-center gap-6 mt-4">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS.verified }} />
+                                    <span className="text-sm text-muted-foreground">Verified ({stats.verified_users})</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS.unverified }} />
+                                    <span className="text-sm text-muted-foreground">Unverified ({verificationStatus[1]?.value || 0})</span>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
 
                 {/* Recent Users Table */}

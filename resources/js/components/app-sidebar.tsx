@@ -114,7 +114,7 @@ const footerNavItems: NavItem[] = [
     // },
     {
         title: 'Create Ticket',
-        href: 'http://172.16.1.5:8000/',
+        href: 'http://172.16.1.5:8000/helpdesk/ticket-view/',
         icon: TicketCheck,
     },
 ];
