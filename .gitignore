@@ -26,3 +26,6 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+daily-clear-cache.bat
+package-lock.json
+setup-daily-task.bat
