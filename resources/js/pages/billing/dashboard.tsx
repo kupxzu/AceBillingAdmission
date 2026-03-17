@@ -1,10 +1,28 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { CreditCard, DollarSign, FileText, Clock, Receipt } from 'lucide-react';
+import { CreditCard, DollarSign, FileText, Clock, Receipt, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
 import { useMemo, useState } from 'react';
+import {
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend,
+    ResponsiveContainer,
+    PieChart,
+    Pie,
+    Cell,
+    AreaChart,
+    Area,
+    ComposedChart,
+    Line,
+} from 'recharts';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -27,8 +45,28 @@ interface PatientBill {
     created_at: string;
 }
 
+interface MonthlyBilling {
+    month: string;
+    invoices: number;
+    amount: number;
+}
+
+interface AmountDistribution {
+    name: string;
+    value: number;
+    [key: string]: string | number;
+}
+
+const COLORS = ['#3b82f6', '#06b6d4', '#22c55e', '#f59e0b', '#ef4444'];
+
 export default function BillingDashboard() {
-    const { stats, patientBills: patientBillsProp } = usePage<{ stats: DashboardStats; patientBills: PatientBill[] }>().props;
+    const { stats, patientBills: patientBillsProp, monthlyBilling, recentSoas, amountDistribution } = usePage<{
+        stats: DashboardStats;
+        patientBills: PatientBill[];
+        monthlyBilling: MonthlyBilling[];
+        recentSoas: PatientBill[];
+        amountDistribution: AmountDistribution[];
+    }>().props;
     const patientBills = patientBillsProp ?? [];
     const [showInsights, setShowInsights] = useState(false);
 
@@ -146,50 +184,223 @@ export default function BillingDashboard() {
                     })}
                 </div>
 
-                {/* Recent Activity Section */}
-                <div className="grid gap-4 md:grid-cols-2">
-                    <Card>
+                {/* Charts Section */}
+                <div className="grid gap-6 lg:grid-cols-3">
+                    {/* Monthly Billing Trend - Area Chart */}
+                    <Card className="lg:col-span-2">
                         <CardHeader>
-                            <CardTitle>Recent Invoices</CardTitle>
+                            <CardTitle className="flex items-center gap-2">
+                                <TrendingUp className="size-5 text-primary" />
+                                Billing Trend
+                            </CardTitle>
                             <CardDescription>
-                                Your latest billing documents
+                                Monthly invoices and revenue over the last 6 months
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
-                                No invoices yet
+                            <div className="h-[300px]">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <ComposedChart data={monthlyBilling}>
+                                        <defs>
+                                            <linearGradient id="amountGradient" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                                                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                                        <XAxis dataKey="month" className="text-xs" />
+                                        <YAxis 
+                                            yAxisId="left" 
+                                            className="text-xs" 
+                                            allowDecimals={false}
+                                            tickFormatter={(value) => value.toLocaleString()}
+                                        />
+                                        <YAxis 
+                                            yAxisId="right" 
+                                            orientation="right" 
+                                            className="text-xs"
+                                            tickFormatter={(value) => `₱${(value / 1000).toFixed(0)}k`}
+                                        />
+                                        <Tooltip
+                                            contentStyle={{
+                                                backgroundColor: 'hsl(var(--card))',
+                                                border: '1px solid hsl(var(--border))',
+                                                borderRadius: '8px',
+                                            }}
+                                            formatter={(value, name) => [
+                                                name === 'amount' ? formatCurrency(value as number) : value,
+                                                name === 'amount' ? 'Revenue' : 'Invoices'
+                                            ]}
+                                        />
+                                        <Legend />
+                                        <Area
+                                            yAxisId="right"
+                                            type="monotone"
+                                            dataKey="amount"
+                                            name="Revenue"
+                                            stroke="#3b82f6"
+                                            fill="url(#amountGradient)"
+                                            strokeWidth={2}
+                                        />
+                                        <Bar
+                                            yAxisId="left"
+                                            dataKey="invoices"
+                                            name="Invoices"
+                                            fill="#06b6d4"
+                                            radius={[4, 4, 0, 0]}
+                                            barSize={30}
+                                        />
+                                    </ComposedChart>
+                                </ResponsiveContainer>
                             </div>
                         </CardContent>
                     </Card>
 
+                    {/* Amount Distribution Pie Chart */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>Payment History</CardTitle>
+                            <CardTitle>Invoice Distribution</CardTitle>
                             <CardDescription>
-                                Your recent transactions
+                                Breakdown by amount range
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
-                                No payments yet
+                            <div className="h-[280px]">
+                                {amountDistribution && amountDistribution.length > 0 ? (
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                            <Pie
+                                                data={amountDistribution}
+                                                cx="50%"
+                                                cy="50%"
+                                                innerRadius={50}
+                                                outerRadius={80}
+                                                paddingAngle={5}
+                                                dataKey="value"
+                                                label={({ name, percent }) =>
+                                                    `${((percent ?? 0) * 100).toFixed(0)}%`
+                                                }
+                                            >
+                                                {amountDistribution.map((_, index) => (
+                                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip
+                                                contentStyle={{
+                                                    backgroundColor: 'hsl(var(--card))',
+                                                    border: '1px solid hsl(var(--border))',
+                                                    borderRadius: '8px',
+                                                }}
+                                                formatter={(value) => [`${value} invoices`, 'Count']}
+                                            />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                ) : (
+                                    <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+                                        No data available
+                                    </div>
+                                )}
                             </div>
+                            {amountDistribution && amountDistribution.length > 0 && (
+                                <div className="flex flex-wrap justify-center gap-3 mt-2">
+                                    {amountDistribution.map((item, index) => (
+                                        <div key={item.name} className="flex items-center gap-1.5">
+                                            <div 
+                                                className="w-2.5 h-2.5 rounded-full" 
+                                                style={{ backgroundColor: COLORS[index % COLORS.length] }} 
+                                            />
+                                            <span className="text-xs text-muted-foreground">{item.name}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </div>
+
+                {/* Recent SOAs Table */}
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <div>
+                            <CardTitle>Recent Statements</CardTitle>
+                            <CardDescription>
+                                Latest patient statement of accounts
+                            </CardDescription>
+                        </div>
+                        <Link href="/billing/patient-soa">
+                            <button className="rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground">
+                                View All
+                            </button>
+                        </Link>
+                    </CardHeader>
+                    <CardContent>
+                        {recentSoas && recentSoas.length > 0 ? (
+                            <div className="overflow-x-auto">
+                                <table className="w-full table-auto text-sm">
+                                    <thead>
+                                        <tr className="text-left text-muted-foreground border-b">
+                                            <th className="px-3 py-3 font-medium">Patient</th>
+                                            <th className="px-3 py-3 font-medium text-right">Amount</th>
+                                            <th className="px-3 py-3 font-medium">Date</th>
+                                            <th className="px-3 py-3 font-medium text-right">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {recentSoas.map((soa) => (
+                                            <tr key={soa.id} className="border-b last:border-0 hover:bg-muted/50">
+                                                <td className="px-3 py-3 font-medium">{soa.patient_name}</td>
+                                                <td className="px-3 py-3 text-right">
+                                                    <Badge variant="secondary" className="font-mono">
+                                                        {formatCurrency(soa.amount)}
+                                                    </Badge>
+                                                </td>
+                                                <td className="px-3 py-3 text-muted-foreground">
+                                                    {soa.created_at ? new Date(soa.created_at).toLocaleDateString('en-US', {
+                                                        month: 'short',
+                                                        day: 'numeric',
+                                                        year: 'numeric'
+                                                    }) : '—'}
+                                                </td>
+                                                <td className="px-3 py-3 text-right">
+                                                    <Link href={`/billing/patient-soa/${soa.id}`}>
+                                                        <button className="text-primary hover:underline text-sm">
+                                                            View
+                                                        </button>
+                                                    </Link>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ) : (
+                            <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
+                                No statements yet
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
 
                 {/* Quick Actions */}
                 <Card>
                     <CardHeader>
                         <CardTitle>Quick Actions</CardTitle>
                         <CardDescription>
-                            Common tasks for managing your account
+                            Common tasks for billing management
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="flex flex-wrap gap-2">
-                            <button className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
-                                View All Invoices
-                            </button>
+                            <Link href="/billing/patient-soa">
+                                <button className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+                                    View All SOAs
+                                </button>
+                            </Link>
+                            <Link href="/billing/patient-soa/create">
+                                <button className="rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground">
+                                    Create New SOA
+                                </button>
+                            </Link>
                             <button className="rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground">
                                 Payment Methods
                             </button>

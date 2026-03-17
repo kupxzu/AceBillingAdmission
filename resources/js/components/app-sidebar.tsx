@@ -13,7 +13,7 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, FileText, CreditCard, Users, Settings, Activity, ClipboardList, Receipt, TicketCheck } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, FileText, CreditCard, Users, Settings, Activity, ClipboardList, Receipt, TicketCheck, Rocket } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const getNavItemsForRole = (role?: string): NavItem[] => {
@@ -106,22 +106,30 @@ const getNavItemsForRole = (role?: string): NavItem[] => {
     ];
 };
 
-const footerNavItems: NavItem[] = [
-    // {
-    //     title: 'Repository',
-    //     href: 'https://github.com/laravel/react-starter-kit',
-    //     icon: Folder,
-    // },
-    {
+const getFooterNavItems = (role?: string): NavItem[] => {
+    const items: NavItem[] = [];
+
+    if (role === 'admin') {
+        items.push({
+            title: 'Create Survey',
+            href: 'http://172.16.2.135/surveys/create',
+            icon: Rocket,
+        });
+    }
+
+    items.push({
         title: 'Create Ticket',
-        href: 'http://172.16.1.5:8000/',
+        href: 'http://172.16.1.5:8000/helpdesk/ticket-view/',
         icon: TicketCheck,
-    },
-];
+    });
+
+    return items;
+};
 
 export function AppSidebar() {
     const { auth } = usePage<{ auth: { user: { role?: string } } }>().props;
     const mainNavItems = getNavItemsForRole(auth.user?.role);
+    const footerNavItems = getFooterNavItems(auth.user?.role);
     
     const homeUrl = auth.user?.role === 'billing' 
         ? '/billing/dashboard' 
