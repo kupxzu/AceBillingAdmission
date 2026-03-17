@@ -8,7 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import InputError from '@/components/input-error';
 import { Spinner } from '@/components/ui/spinner';
+import { DeleteConfirmModal } from '@/components/delete-confirm-modal';
 import { toast } from 'react-toastify';
+import { useState } from 'react';
 
 interface Patient {
     id: number;
@@ -37,6 +39,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function EditPatient() {
     const { patient } = usePage<{ patient: Patient }>().props;
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleting, setDeleting] = useState(false);
 
     const { data, setData, put, processing, errors } = useForm({
         first_name: patient.first_name || '',
@@ -60,16 +64,17 @@ export default function EditPatient() {
     };
 
     const handleDelete = () => {
-        if (confirm('Are you sure you want to delete this patient? This action cannot be undone.')) {
-            router.delete(`/admitting/patients/${patient.id}`, {
-                onSuccess: () => {
-                    toast.success('Patient deleted successfully!');
-                },
-                onError: () => {
-                    toast.error('Failed to delete patient.');
-                },
-            });
-        }
+        setDeleting(true);
+        router.delete(`/admitting/patients/${patient.id}`, {
+            onSuccess: () => {
+                toast.success('Patient deleted successfully!');
+            },
+            onError: () => {
+                toast.error('Failed to delete patient.');
+                setDeleting(false);
+                setShowDeleteModal(false);
+            },
+        });
     };
 
     return (
@@ -84,7 +89,7 @@ export default function EditPatient() {
                             Update patient information
                         </p>
                     </div>
-                    <Button variant="destructive" onClick={handleDelete}>
+                    <Button variant="destructive" onClick={() => setShowDeleteModal(true)}>
                         Delete Patient
                     </Button>
                 </div>
@@ -190,6 +195,15 @@ export default function EditPatient() {
                         </CardContent>
                     </Card>
                 </form>
+
+                <DeleteConfirmModal
+                    open={showDeleteModal}
+                    onOpenChange={setShowDeleteModal}
+                    onConfirm={handleDelete}
+                    title="Delete Patient"
+                    itemName={`${patient.first_name} ${patient.last_name}`}
+                    processing={deleting}
+                />
             </div>
         </AppLayout>
     );

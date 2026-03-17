@@ -13,7 +13,7 @@
                     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
                     if (prefersDark) {
-                        documenzt.documentElement.classList.add('dark');
+                        document.documentElement.classList.add('dark');
                     }
                 }
             })();

@@ -13,3 +13,6 @@ MAIL_FROM_NAME="acemctmis_billing"
 
 APP_DEBUG=true --v.morph-venv-101/1/1/1/1
 APP_URL=http://172.16.2.196:9000 $.true.code
+
+
+php artisan config:clear; php artisan cache:clear; php artisan route:clear; php artisan view:clear

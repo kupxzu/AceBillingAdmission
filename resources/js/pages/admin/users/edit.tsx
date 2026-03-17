@@ -20,6 +20,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { DeleteConfirmModal } from '@/components/delete-confirm-modal';
 import InputError from '@/components/input-error';
 import { Spinner } from '@/components/ui/spinner';
 import { toast } from 'react-toastify';
@@ -52,6 +53,8 @@ export default function EditUser() {
     const { user } = usePage<{ user: UserData }>().props;
     const [sendingPassword, setSendingPassword] = useState(false);
     const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleting, setDeleting] = useState(false);
 
     const { data, setData, put, processing, errors } = useForm({
         name: user.name || '',
@@ -87,16 +90,17 @@ export default function EditUser() {
     };
 
     const handleDelete = () => {
-        if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
-            router.delete(`/admin/users/${user.id}`, {
-                onSuccess: () => {
-                    toast.success('User deleted successfully!');
-                },
-                onError: () => {
-                    toast.error('Failed to delete user.');
-                },
-            });
-        }
+        setDeleting(true);
+        router.delete(`/admin/users/${user.id}`, {
+            onSuccess: () => {
+                toast.success('User deleted successfully!');
+            },
+            onError: () => {
+                toast.error('Failed to delete user.');
+                setDeleting(false);
+                setShowDeleteModal(false);
+            },
+        });
     };
 
     return (
@@ -263,7 +267,7 @@ export default function EditUser() {
                                 <Button
                                     type="button"
                                     variant="destructive"
-                                    onClick={handleDelete}
+                                    onClick={() => setShowDeleteModal(true)}
                                     className="ml-auto"
                                 >
                                     Delete User
@@ -272,6 +276,15 @@ export default function EditUser() {
                         </CardContent>
                     </Card>
                 </form>
+
+                <DeleteConfirmModal
+                    open={showDeleteModal}
+                    onOpenChange={setShowDeleteModal}
+                    onConfirm={handleDelete}
+                    title="Delete User"
+                    itemName={user.name}
+                    processing={deleting}
+                />
             </div>
         </AppLayout>
     );

@@ -307,7 +307,7 @@ export default function CreatePatientSOA() {
 
                             {/* Actions */}
                             <div className="flex gap-2 pt-4">
-                                <Button type="submit" disabled={processing}>
+                                <Button type="submit" disabled={processing} className="animate-glow">
                                     {processing && <Spinner />}
                                     Create SOA
                                 </Button>

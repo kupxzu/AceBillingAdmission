@@ -30,8 +30,8 @@ export default function PublicSOAView({ soa }: Props) {
             day: 'numeric',
         });
 
-    const formatCurrency = (value: number) =>
-        '₱' + value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const formatCurrency = (value: number | string) =>
+        '₱' + Number(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     return (
         <>

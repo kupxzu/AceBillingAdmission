@@ -25,6 +25,7 @@ import {
 import QRCodeLib from 'qrcode';
 import { PDFViewer } from '@/components/pdf-viewer';
 import { toast } from 'react-toastify';
+import { Spinner } from '@/components/ui/spinner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -142,7 +143,8 @@ export default function PatientSOAIndex() {
                         </p>
                     </div>
                     <Link href="/billing/patient-soa/create">
-                        <Button>
+
+                        <Button type="submit" className="animate-glow">
                             <Plus className="mr-2 size-4" />
                             Create SOA
                         </Button>

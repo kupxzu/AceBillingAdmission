@@ -14,6 +14,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { DeleteConfirmModal } from '@/components/delete-confirm-modal';
 import { useState } from 'react';
 import {
     Select,
@@ -67,6 +68,9 @@ export default function UsersIndex() {
 
     const [search, setSearch] = useState(filters.search || '');
     const [roleFilter, setRoleFilter] = useState(filters.role || 'all');
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [deleting, setDeleting] = useState(false);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -78,17 +82,26 @@ export default function UsersIndex() {
         router.get('/admin/users', { search, role: value === 'all' ? '' : value }, { preserveState: true });
     };
 
-    const handleDelete = (user: User) => {
-        if (confirm(`Are you sure you want to delete ${user.name}? This action cannot be undone.`)) {
-            router.delete(`/admin/users/${user.id}`, {
-                onSuccess: () => {
-                    toast.success('User deleted successfully!');
-                },
-                onError: () => {
-                    toast.error('Failed to delete user.');
-                },
-            });
-        }
+    const openDeleteModal = (user: User) => {
+        setSelectedUser(user);
+        setShowDeleteModal(true);
+    };
+
+    const handleDelete = () => {
+        if (!selectedUser) return;
+        setDeleting(true);
+        router.delete(`/admin/users/${selectedUser.id}`, {
+            onSuccess: () => {
+                toast.success('User deleted successfully!');
+                setShowDeleteModal(false);
+                setSelectedUser(null);
+                setDeleting(false);
+            },
+            onError: () => {
+                toast.error('Failed to delete user.');
+                setDeleting(false);
+            },
+        });
     };
 
     const getRoleBadgeVariant = (role: string) => {
@@ -244,7 +257,7 @@ export default function UsersIndex() {
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
-                                                        onClick={() => handleDelete(user)}
+                                                        onClick={() => openDeleteModal(user)}
                                                         className="text-destructive hover:text-destructive"
                                                     >
                                                         <Trash2 className="size-4" />
@@ -279,6 +292,15 @@ export default function UsersIndex() {
                         )}
                     </CardContent>
                 </Card>
+
+                <DeleteConfirmModal
+                    open={showDeleteModal}
+                    onOpenChange={setShowDeleteModal}
+                    onConfirm={handleDelete}
+                    title="Delete User"
+                    itemName={selectedUser?.name}
+                    processing={deleting}
+                />
             </div>
         </AppLayout>
     );
