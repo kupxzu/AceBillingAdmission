@@ -1,4 +1,4 @@
-import { dashboard, login, register } from '@/routes';
+import { dashboard, login } from '@/routes';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { FileText, CreditCard, Users, Shield, ArrowRight, Lock, CheckCircle2 } from 'lucide-react';
@@ -101,14 +101,12 @@ export default function Welcome({
                                             Sign In Securely
                                             <ArrowRight className="size-4" />
                                         </Link>
-                                        {canRegister && (
-                                            <Link
-                                                href={register()}
-                                                className="inline-flex items-center gap-2 rounded-md border px-6 py-3 text-base font-medium hover:bg-accent"
-                                            >
-                                                Request Access
-                                            </Link>
-                                        )}
+                                        <Link
+                                            href="/request-access"
+                                            className="inline-flex items-center gap-2 rounded-md border px-6 py-3 text-base font-medium hover:bg-accent"
+                                        >
+                                            Request Access
+                                        </Link>
                                     </>
                                 )}
                             </div>
