@@ -8,10 +8,10 @@ import { viteStaticCopy } from 'vite-plugin-static-copy';
 export default defineConfig({
     server: {
         host: '0.0.0.0',
-        port: 9000,
+        port: 8003,
         strictPort: false,
         hmr: {
-            host: '172.16.2.196',
+            host: '192.168.1.201',
         },
     },
     plugins: [
